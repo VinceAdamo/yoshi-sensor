@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+    mosquitto:
+        image: eclipse-mosquitto
+        restart: always
+        ports:
+            - 2883:2883
+            - 9001:9001
+        volumes:
+          - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    postgres:
+        image: postgres:11.13
+        restart: always
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=test
+            - POSTGRES_DB=yoshi
+        ports:
+            - 5432:5432
+        volumes:
+            - psql-data:/var/lib/postgresql/data
+
+volumes:
+  psql-data:
