@@ -6,14 +6,35 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 class SimpleMqttCallBack implements MqttCallback {
- 
+  private static Logger logger = LogManager.getLogger(SimpleMqttCallBack.class);
+
   public void connectionLost(Throwable throwable) {
-    System.out.println("Connection to MQTT broker lost!");
+    logger.error("Connection to MQTT broker lost!");
   }
  
   public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-    System.out.println("Message received:\n\t"+ new String(mqttMessage.getPayload()) );
+    String payload = new String(mqttMessage.getPayload());
+
+    logger.info("Message received");
+
+    logger.debug("Payload: " + payload);
+
+    ObjectMapper mapper = new ObjectMapper();
+
+    Readings readings;
+
+    try {
+      readings = mapper.readValue(payload, Readings.class);
+    } catch (Exception e) {
+      logger.error("Invalid Payload");
+      return;
+    }
   }
  
   public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
