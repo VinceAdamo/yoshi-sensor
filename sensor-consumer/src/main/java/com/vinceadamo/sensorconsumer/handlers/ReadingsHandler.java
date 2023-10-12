@@ -10,51 +10,28 @@ import java.sql.Timestamp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vinceadamo.sensorconsumer.jsonobjects.Device;
 import com.vinceadamo.sensorconsumer.jsonobjects.Measurement;
 
-public class ReadingsHandler {
+public abstract class ReadingsHandler {
     private static Logger logger = LogManager.getLogger(ReadingsHandler.class);
 
     protected Timestamp timestamp;
     protected String serialNumber;
     protected float value;
     protected String urlBasePath;
+    protected Device device;
     
-    public ReadingsHandler(Timestamp timestamp, String serialNumber) {
+    public ReadingsHandler(Timestamp timestamp, String serialNumber, Device device) {
         this.timestamp = timestamp;
         this.serialNumber = serialNumber;
+        this.device = device;
     }
 
+    abstract Measurement getLatest() throws Exception;
+
     public void handleReadings() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
-        HttpClient client = HttpClient.newHttpClient();
-
-        HttpRequest deviceRequest = HttpRequest
-            .newBuilder()
-            .GET()
-            .uri(URI.create("http://localhost:8090/device/serialNumber/" + this.serialNumber))
-            .header("accept", "application/json")
-            .build();
-
-        HttpResponse<String> deviceResponse = client.send(deviceRequest, BodyHandlers.ofString());
-
-        Device device = mapper.readValue(deviceResponse.body(), Device.class);
-
-        logger.info(device.id);
-
-        HttpRequest valueRequest = HttpRequest
-            .newBuilder()
-            .GET()
-            .uri(URI.create("http://localhost:8090/" + this.urlBasePath + "/" + device.id + "/latest"))
-            .header("accept", "application/json")
-            .build();
-
-        HttpResponse<String> valueResponse = client.send(valueRequest, BodyHandlers.ofString());
-
-        Measurement measurement = mapper.readValue(valueResponse.body(), Measurement.class);
+        Measurement measurement = this.getLatest();
 
         logger.info(measurement.timestamp);
     }
