@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import com.vinceadamo.sensorconsumer.jsonobjects.Device;
 import com.vinceadamo.sensorconsumer.jsonobjects.Measurement;
 import com.vinceadamo.sensorconsumer.jsonobjects.Readings;
-import com.vinceadamo.sensorconsumer.services.TemperatureService;
+import com.vinceadamo.sensorconsumer.services.MeasurementService;
 
 public class TemperatureReadingsHandler extends ReadingsHandler {
     private static Logger logger = LogManager.getLogger(TemperatureReadingsHandler.class);
@@ -14,14 +14,16 @@ public class TemperatureReadingsHandler extends ReadingsHandler {
     public TemperatureReadingsHandler(Readings readings, Device device) {
         super(readings.timestamp, readings.serialNumber, device);
         this.value = readings.temperature;
+        this.measurementType = "temperature";
     }
 
     Measurement getLatest() throws Exception {
         logger.info("Retrieving latest temperature for device " + this.device.id);
-        return TemperatureService.getLatest(this.device.id);
+        return MeasurementService.getLatest(this.measurementType, this.device.id);
     }
 
     Measurement create() throws Exception {
-        return TemperatureService.create(this.device.id, this.value, this.timestamp);
+        logger.info("Creating new temperature measurement");
+        return MeasurementService.create(this.measurementType, this.device.id, this.value, this.timestamp);
     }
  }

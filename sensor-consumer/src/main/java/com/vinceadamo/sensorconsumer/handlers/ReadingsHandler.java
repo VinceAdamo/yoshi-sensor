@@ -21,6 +21,7 @@ public abstract class ReadingsHandler {
     protected float value;
     protected String urlBasePath;
     protected Device device;
+    protected String measurementType;
     
     public ReadingsHandler(Timestamp timestamp, String serialNumber, Device device) {
         this.timestamp = timestamp;
@@ -40,7 +41,6 @@ public abstract class ReadingsHandler {
         int compareValue = this.timestamp.compareTo(measurement.timestamp);
 
         if (compareValue > 0 && measurement.value != this.value)  {
-            logger.info("Creating new measurement");
             Measurement newMeasurement = this.create();
             logger.debug("Measurement with id " + newMeasurement.id + " created");
             return;

@@ -14,10 +14,10 @@ import org.apache.logging.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vinceadamo.sensorconsumer.jsonobjects.Measurement;
 
-public class TemperatureService {
-    private static Logger logger = LogManager.getLogger(TemperatureService.class);
+public class MeasurementService {
+    private static Logger logger = LogManager.getLogger(MeasurementService.class);
 
-    public static Measurement getLatest(UUID deviceId) throws Exception {
+    public static Measurement getLatest(String measurementType, UUID deviceId) throws Exception {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
@@ -26,7 +26,7 @@ public class TemperatureService {
             HttpRequest request = HttpRequest
                 .newBuilder()
                 .GET()
-                .uri(URI.create("http://localhost:8090/temperature/" + deviceId + "/latest"))
+                .uri(URI.create("http://localhost:8090/" + measurementType + "/" + deviceId + "/latest"))
                 .header("accept", "application/json")
                 .build();
 
@@ -39,7 +39,7 @@ public class TemperatureService {
         }
     }
 
-    public static Measurement create(UUID deviceId, float value, Timestamp timestamp) throws Exception {
+    public static Measurement create(String measurementType, UUID deviceId, float value, Timestamp timestamp) throws Exception {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
@@ -50,7 +50,7 @@ public class TemperatureService {
             HttpRequest request = HttpRequest
                 .newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(body))
-                .uri(URI.create("http://localhost:8090/temperature"))
+                .uri(URI.create("http://localhost:8090/" + measurementType))
                 .header("Content-Type", "application/json")
                 .build();
 
