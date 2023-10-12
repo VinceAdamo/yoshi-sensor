@@ -1,4 +1,4 @@
-package com.vinceadamo.sensorconsumer;
+package com.vinceadamo.sensorconsumer.jsonobjects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.sql.Timestamp;
@@ -13,6 +13,6 @@ public class Readings {
     @JsonProperty("timestamp")
     public Timestamp timestamp;
 
-    @JsonProperty("deviceId")
-    public String deviceId;
+    @JsonProperty("serialNumber")
+    public String serialNumber;
 }
