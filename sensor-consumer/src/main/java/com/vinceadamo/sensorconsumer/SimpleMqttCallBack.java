@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import com.vinceadamo.sensorconsumer.handlers.HumidityReadingsHandler;
 import com.vinceadamo.sensorconsumer.handlers.TemperatureReadingsHandler;
 import com.vinceadamo.sensorconsumer.jsonobjects.Readings;
 
@@ -40,6 +41,7 @@ class SimpleMqttCallBack implements MqttCallback {
     }
 
     new TemperatureReadingsHandler(readings).handleReadings();
+    new HumidityReadingsHandler(readings).handleReadings();
   }
  
   public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
