@@ -7,9 +7,13 @@ import com.vinceadamo.dataapi.dataapi.repositories.TemperatureRepository;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
@@ -32,9 +36,9 @@ public class TemperatureController {
 		return this.temperatureRepository.save(temperature);
 	}
 
-	@GetMapping("/latest")
-	public Temperature latest() {
-		logger.info("Fetching latest temperature");
-		return this.temperatureRepository.findFirstByOrderByTimestampDesc();
+	@GetMapping("/{deviceId}/latest")
+	public Temperature latest(@PathVariable(value="deviceId") final UUID deviceId) {
+		logger.info("Fetching latest temperature for device " + deviceId);
+		return this.temperatureRepository.findFirstByDeviceIdOrderByTimestampDesc(deviceId);
 	}
 }
