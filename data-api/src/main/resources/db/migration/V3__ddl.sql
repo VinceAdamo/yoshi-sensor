@@ -1,0 +1,1 @@
+ALTER TABLE devices ADD CONSTRAINT serial_number_unique UNIQUE (serial_number);
