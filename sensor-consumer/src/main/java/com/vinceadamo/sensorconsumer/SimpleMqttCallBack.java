@@ -7,7 +7,6 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.logging.log4j.Logger;
@@ -24,6 +23,7 @@ class SimpleMqttCallBack implements MqttCallback {
 
   public void connectionLost(Throwable throwable) {
     logger.error("Connection to MQTT broker lost!");
+    System.exit(0);
   }
  
   public void messageArrived(String s, MqttMessage mqttMessage) {
