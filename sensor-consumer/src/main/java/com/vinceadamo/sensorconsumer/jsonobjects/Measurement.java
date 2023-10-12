@@ -17,4 +17,8 @@ public class Measurement {
 
     @JsonProperty("timestamp")
     public Timestamp timestamp;
+
+    public String toString() {
+        return "{\"id\": \"" + this.id + "\", \"value\": " + this.value + ", \"deviceId\": \"" + this.deviceId +  "\", \"timestamp\": \"" + this.timestamp + "\"}";
+    }
 }

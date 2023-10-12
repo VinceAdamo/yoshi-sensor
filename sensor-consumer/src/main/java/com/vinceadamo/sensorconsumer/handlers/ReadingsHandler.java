@@ -30,9 +30,22 @@ public abstract class ReadingsHandler {
 
     abstract Measurement getLatest() throws Exception;
 
+    abstract Measurement create() throws Exception;
+
     public void handleReadings() throws Exception {
         Measurement measurement = this.getLatest();
 
-        logger.info(measurement.timestamp);
+        logger.debug(measurement.toString());
+
+        int compareValue = this.timestamp.compareTo(measurement.timestamp);
+
+        if (compareValue > 0 && measurement.value != this.value)  {
+            logger.info("Creating new measurement");
+            Measurement newMeasurement = this.create();
+            logger.debug("Measurement with id " + newMeasurement.id + " created");
+            return;
+        }
+
+        logger.info("Not creating new measurement");
     }
 }
