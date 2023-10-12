@@ -36,9 +36,7 @@ class SimpleMqttCallBack implements MqttCallback {
 
       ObjectMapper mapper = new ObjectMapper();
 
-      Readings readings;
-
-      readings = mapper.readValue(payload, Readings.class);
+      Readings readings = mapper.readValue(payload, Readings.class);
 
       final Device device = DeviceService.readBySerialNumber(readings.serialNumber);
 
