@@ -58,7 +58,9 @@ class SimpleMqttCallBack implements MqttCallback {
       executor.shutdown();
       executor.awaitTermination(2, TimeUnit.MINUTES);
 
-      System.out.printf("completed IO calls in %d ms\n", System.currentTimeMillis() - startTime);
+      long endTime = System.currentTimeMillis() - startTime;
+
+      logger.debug("Completed calls in " + endTime + " ms");
     } catch (JsonProcessingException e) {
       logger.error("Invalid Payload");
       return;
