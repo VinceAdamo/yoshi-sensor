@@ -1,10 +1,5 @@
 package com.vinceadamo.sensorconsumer.handlers;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.sql.Timestamp;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,19 +28,23 @@ public abstract class ReadingsHandler {
 
     abstract Measurement create() throws Exception;
 
-    public void handleReadings() throws Exception {
-        Measurement measurement = this.getLatest();
+    public void handleReadings() {
+        try {
+            Measurement measurement = this.getLatest();
 
-        logger.debug(measurement.toString());
+            logger.debug(measurement.toString());
 
-        int compareValue = this.timestamp.compareTo(measurement.timestamp);
+            int compareValue = this.timestamp.compareTo(measurement.timestamp);
 
-        if (compareValue > 0 && measurement.value != this.value)  {
-            Measurement newMeasurement = this.create();
-            logger.debug("Measurement with id " + newMeasurement.id + " created");
-            return;
+            if (compareValue > 0 && measurement.value != this.value)  {
+                Measurement newMeasurement = this.create();
+                logger.debug("Measurement with id " + newMeasurement.id + " created");
+                return;
+            }
+
+            logger.info("Not creating new measurement");
+        } catch (Exception e) {
+            logger.error(e);
         }
-
-        logger.info("Not creating new measurement");
     }
 }
