@@ -1,0 +1,1 @@
+ALTER TABLE humidity RENAME CONSTRAINT fk_temperature_to_devices TO fk_humidity_to_devices;
