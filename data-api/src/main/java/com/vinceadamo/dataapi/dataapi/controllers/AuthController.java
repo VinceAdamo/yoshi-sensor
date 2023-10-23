@@ -46,6 +46,8 @@ public class AuthController {
             Authentication authentication =
                     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginReq.getEmail(), loginReq.getPassword()));
 
+            System.out.println(authentication.isAuthenticated());
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String email = authentication.getName();
 

@@ -8,9 +8,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.vinceadamo.dataapi.dataapi.entities.User;
+import com.vinceadamo.dataapi.dataapi.entities.UserInfoDetails;
 import com.vinceadamo.dataapi.dataapi.repositories.UserRepository;
 
-import java.util.ArrayList;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -24,10 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("Email not found" + email);
         }
-        return new org.springframework.security.core.userdetails.User(
-            user.getEmail(), 
-            user.getPassword(), 
-            new ArrayList<>()
-        );
+        return new UserInfoDetails(user);
     }
 }
