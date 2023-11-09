@@ -21,7 +21,7 @@ public class User {
     
     private String email;
   
-    private User() {}
+    public User() {}
     
     public User(
       String email,

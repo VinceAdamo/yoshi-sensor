@@ -1,10 +1,10 @@
-package com.vinceadamo.dataapi.dataapi.entities;
+package com.vinceadamo.dataapi.dataapi.requests;
 
-public class LoginReq {
+public class UserRequest {
     private String email;
     private String password;
 
-    public LoginReq(String email, String password) {
+    public UserRequest(String email, String password) {
         this.email = email;
         this.password = password;
     }
