@@ -2,15 +2,21 @@ package com.vinceadamo.authproxy.authproxy;
 
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.stereotype.Component;
 
 import org.springframework.web.server.ServerWebExchange;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vinceadamo.authproxy.authproxy.services.JwtService;
 
 import io.jsonwebtoken.Claims;
+import reactor.core.publisher.Flux;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 @Component
 public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFactory.Config> {
@@ -31,9 +37,20 @@ public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFa
                 // User exists, continue the request
                 return chain.filter(exchange);
             } else {
-                // User does not exist, return an error response
-                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-                return exchange.getResponse().setComplete();
+                ObjectMapper mapper = new ObjectMapper();
+                ObjectNode rootNode = mapper.createObjectNode();
+                rootNode.put("message", "Invalid Jwt");
+                rootNode.put("statusCode", HttpStatus.UNAUTHORIZED.value());
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+                final ObjectWriter writer = mapper.writer();
+                try {
+                    final byte[] bytes = writer.writeValueAsBytes(rootNode);
+                    DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
+                    return exchange.getResponse().writeWith(Flux.just(buffer));
+                } catch (Exception e) {
+                    return exchange.getResponse().setComplete();
+                }
             }
         };
     }
