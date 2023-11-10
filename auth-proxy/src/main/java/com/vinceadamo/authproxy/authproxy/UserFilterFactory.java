@@ -1,7 +1,10 @@
 package com.vinceadamo.authproxy.authproxy;
 
+import java.util.UUID;
+
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +14,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vinceadamo.authproxy.authproxy.exceptions.InvalidAuthHeaderException;
+import com.vinceadamo.authproxy.authproxy.jsonobjects.User;
 import com.vinceadamo.authproxy.authproxy.services.JwtService;
+import com.vinceadamo.authproxy.authproxy.services.UserService;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -36,9 +41,19 @@ public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFa
             try {
                 String token = extractJwtToken(exchange);
                 
-                String email = extractEmailFromJwtToken(token);
+                Claims claims = JwtService.validate(token);
 
-                return chain.filter(exchange);
+                UUID id = UUID.fromString(
+                    claims.get("id", String.class)
+                );
+
+                String email = claims.getSubject();
+
+                if (doesUserExistInDatabase(id, email)) {
+                    return chain.filter(exchange);
+                }
+
+                return exceptionHandler(exchange, "Invalid User!");
             } catch (InvalidAuthHeaderException e) {
                 return exceptionHandler(exchange, e.getMessage());
             } catch (ExpiredJwtException e) {
@@ -73,16 +88,13 @@ public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFa
         return splitHeader[1];
     }
 
-    private String extractEmailFromJwtToken(String token) throws SignatureException, ExpiredJwtException {
-        Claims claims = JwtService.validate(token);
-
-        return claims.getSubject();
-    }
-
-    private boolean doesUserExistInDatabase(String email) {
-        // Implement the database check logic
-        // Return true if the user exists; otherwise, return false
-        return true; // Placeholder logic
+    private boolean doesUserExistInDatabase(UUID id, String email) throws Exception {
+        try {
+            User user = UserService.read(id);
+            return email.equals(user.email);
+        } catch (NotFoundException e) {
+            return false;
+        }
     }
 
     private Mono<Void> exceptionHandler(ServerWebExchange exchange, String errorMessage) {

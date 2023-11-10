@@ -16,6 +16,7 @@ import com.vinceadamo.dataapi.dataapi.repositories.UserRepository;
 import com.vinceadamo.dataapi.dataapi.requests.UserRequest;
 import com.vinceadamo.dataapi.dataapi.responses.NoBodyResponse;
 import com.vinceadamo.dataapi.dataapi.responses.UserLoginResponse;
+import com.vinceadamo.dataapi.dataapi.responses.UserResponse;
 import com.vinceadamo.dataapi.dataapi.services.JwtService;
 
 @RestController()
@@ -100,7 +101,14 @@ public class UserController {
             );
         }
 
-        return ResponseEntity.ok(opt.get());
+        User user = opt.get();
+
+        return ResponseEntity.ok(
+            new UserResponse(
+                user.getEmail(),
+                user.getId()
+            )
+        );
     }
 
     private boolean isUserValid(User user, String password) {
