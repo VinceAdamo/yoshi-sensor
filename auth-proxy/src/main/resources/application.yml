@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: temperature
+          uri: http://localhost:8090
+          predicates:
+            - Path=/temperature/**
+          filters:
+            - UserFilterFactory

@@ -3,27 +3,31 @@ package com.vinceadamo.authproxy.authproxy;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import org.springframework.web.server.ServerWebExchange;
+
+import com.vinceadamo.authproxy.authproxy.services.JwtService;
+
+import io.jsonwebtoken.Claims;
 
 import org.springframework.http.HttpStatus;
 
 @Component
-public class UserFilter extends AbstractGatewayFilterFactory<UserFilter.Config> {
+public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFactory.Config> {
 
-    public UserFilter() {
+    public UserFilterFactory() {
         super(Config.class);
     }
 
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-            // Extract user information from the JWT token (if needed)
-            String userId = extractUserIdFromJwtToken(exchange);
+            String token = extractJwtToken(exchange);
+            
+            String email = extractEmailFromJwtToken(token);
 
             // Check if the user exists in the database
-            if (doesUserExistInDatabase(userId)) {
+            if (email != null && doesUserExistInDatabase(email)) {
                 // User exists, continue the request
                 return chain.filter(exchange);
             } else {
@@ -34,14 +38,23 @@ public class UserFilter extends AbstractGatewayFilterFactory<UserFilter.Config> 
         };
     }
 
-    private String extractUserIdFromJwtToken(ServerWebExchange exchange) {
-        // Extract user information from the JWT token
-        // Adjust this based on the token format and claims
-        // Return the user's ID
-        return "user123"; // Placeholder logic
+    private String extractJwtToken(ServerWebExchange exchange) {
+        String header = exchange.getRequest().getHeaders().getFirst("Authorization");
+        String[] splitHeader = header.split("\\s+");
+        return splitHeader[1];
     }
 
-    private boolean doesUserExistInDatabase(String userId) {
+    private String extractEmailFromJwtToken(String token) {
+        Claims claims = JwtService.validate(token);
+
+        if (claims == null) {
+            return null;
+        }
+
+        return claims.getSubject(); // Placeholder logic
+    }
+
+    private boolean doesUserExistInDatabase(String email) {
         // Implement the database check logic
         // Return true if the user exists; otherwise, return false
         return true; // Placeholder logic
