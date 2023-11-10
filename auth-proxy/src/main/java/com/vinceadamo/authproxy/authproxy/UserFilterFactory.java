@@ -28,8 +28,12 @@ import reactor.core.publisher.Mono;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFactory.Config> {
+    Logger logger = LoggerFactory.getLogger(UserFilterFactory.class);
 
     public UserFilterFactory() {
         super(Config.class);
@@ -40,8 +44,13 @@ public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFa
         return (exchange, chain) -> {
             try {
                 String token = extractJwtToken(exchange);
+
+                logger.info("Successfully extracted token from header");
+                logger.debug(token);
                 
                 Claims claims = JwtService.validate(token);
+
+                logger.info("Successfully validated token");
 
                 UUID id = UUID.fromString(
                     claims.get("id", String.class)
@@ -49,18 +58,25 @@ public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFa
 
                 String email = claims.getSubject();
 
+                logger.info("Extracted id " + id + " and email " + email + " from token");
+
                 if (doesUserExistInDatabase(id, email)) {
+                    logger.info("User successfully authenticated");
                     return chain.filter(exchange);
                 }
 
                 return exceptionHandler(exchange, "Invalid User!");
             } catch (InvalidAuthHeaderException e) {
+                logger.error(e.getMessage());
                 return exceptionHandler(exchange, e.getMessage());
             } catch (ExpiredJwtException e) {
+                logger.error("JWT is expired");
                 return exceptionHandler(exchange, "JWT is expired");
             } catch (SignatureException | MalformedJwtException e) {
+                logger.error("JWT is invalid");
                 return exceptionHandler(exchange, "JWT is invalid");
             } catch (Exception e) {
+                logger.error(e.getMessage());
                 return sendInternalServerError(exchange);
             }
         };
@@ -91,8 +107,10 @@ public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFa
     private boolean doesUserExistInDatabase(UUID id, String email) throws Exception {
         try {
             User user = UserService.read(id);
+            logger.info("Sucessfully retrieved user with email " + user.email + " from database");
             return email.equals(user.email);
         } catch (NotFoundException e) {
+            logger.error("User could not be retrieved from database");
             return false;
         }
     }

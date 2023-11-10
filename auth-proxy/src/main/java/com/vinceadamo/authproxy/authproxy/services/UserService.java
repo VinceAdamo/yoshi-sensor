@@ -12,7 +12,13 @@ import org.springframework.cloud.gateway.support.NotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vinceadamo.authproxy.authproxy.jsonobjects.User;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 public class UserService {
+    static Logger logger = LoggerFactory.getLogger(UserService.class);
+
     public static User read(UUID id) throws Exception {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -28,8 +34,11 @@ public class UserService {
 
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
+            logger.debug(response.body());
+
             return mapper.readValue(response.body(), User.class);
         } catch (Exception e) {
+            logger.error(e.getMessage());
             throw new NotFoundException("User " + id + " not found!");
         }
     }
