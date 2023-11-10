@@ -6,6 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.vinceadamo.dataapi.dataapi.entities.Humidity;
 
-public interface HumidityRepository extends CrudRepository<Humidity, Integer> {
+public interface HumidityRepository extends CrudRepository<Humidity, UUID> {
     Humidity findFirstByDeviceIdOrderByTimestampDesc(UUID deviceId);
 }
