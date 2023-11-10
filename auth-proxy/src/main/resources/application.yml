@@ -2,9 +2,13 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: temperature
+        - id: data
           uri: http://localhost:8090
           predicates:
-            - Path=/temperature/**
+            - Path=/temperature/**,/humidity/**,/device/**
           filters:
             - UserFilterFactory
+        - id: user
+          uri: http://localhost:8090
+          predicates:
+            - Path=/user/login
