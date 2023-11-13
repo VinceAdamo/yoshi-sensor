@@ -1,5 +1,8 @@
 package com.vinceadamo.dataapi.dataapi.controllers;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,4 +30,9 @@ public class DeviceController {
 		return this.deviceRepository.findOneBySerialNumber(serialNumber);
 	}
 
+	@GetMapping("/user/{userId}")
+	public List<Device> getUserDevices(@PathVariable(value="userId") final UUID userId) {
+		logger.info("Fetching devices for user " + userId);
+		return this.deviceRepository.findByUsersId(userId);
+	}
 }
