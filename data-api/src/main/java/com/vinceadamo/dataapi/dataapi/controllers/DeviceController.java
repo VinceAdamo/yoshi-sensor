@@ -1,10 +1,13 @@
 package com.vinceadamo.dataapi.dataapi.controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vinceadamo.dataapi.dataapi.entities.Device;
 import com.vinceadamo.dataapi.dataapi.repositories.DeviceRepository;
+import com.vinceadamo.dataapi.dataapi.responses.NoBodyResponse;
 
 @RestController
 @RequestMapping("/device")
@@ -37,11 +41,24 @@ public class DeviceController {
 	}
 
 	@GetMapping("/{deviceId}/user/{userId}")
-	public Device getDeviceForUser(
+	public ResponseEntity<?> getDeviceForUser(
 		@PathVariable(value="deviceId") final UUID deviceId,
 		@PathVariable(value="userId") final UUID userId
 	) {
 		logger.info("Fetching device with user id " + userId + " for device " + deviceId);
-		return this.deviceRepository.findOneByIdAndUsersId(deviceId, userId);
+		Optional<Device> opt = this.deviceRepository.findOneByIdAndUsersId(deviceId, userId);
+		
+		if (opt.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+				new NoBodyResponse(
+					HttpStatus.NOT_FOUND.value(),
+					"Device not found for user :("
+				)
+			);
+		}
+
+		Device device = opt.get();
+
+		return ResponseEntity.ok().body(device);
 	}
 }

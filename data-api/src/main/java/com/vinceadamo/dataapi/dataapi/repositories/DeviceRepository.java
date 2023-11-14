@@ -1,6 +1,7 @@
 package com.vinceadamo.dataapi.dataapi.repositories;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.repository.CrudRepository;
@@ -12,5 +13,5 @@ public interface DeviceRepository extends CrudRepository<Device, UUID> {
 
     List<Device> findByUsersId(UUID userId);
 
-    Device findOneByIdAndUsersId(UUID id, UUID userId);
+    Optional<Device> findOneByIdAndUsersId(UUID id, UUID userId);
 }
