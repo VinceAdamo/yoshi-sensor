@@ -25,7 +25,7 @@ public class DeviceController {
 	}
 
     @GetMapping("/serialNumber/{serialNumber}")
-	public Device latest(@PathVariable(value="serialNumber") final String serialNumber) {
+	public Device getBySerialNumber(@PathVariable(value="serialNumber") final String serialNumber) {
 		logger.info("Fetching device with serial number " + serialNumber);
 		return this.deviceRepository.findOneBySerialNumber(serialNumber);
 	}
@@ -34,5 +34,14 @@ public class DeviceController {
 	public List<Device> getUserDevices(@PathVariable(value="userId") final UUID userId) {
 		logger.info("Fetching devices for user " + userId);
 		return this.deviceRepository.findByUsersId(userId);
+	}
+
+	@GetMapping("/{deviceId}/user/{userId}")
+	public Device getDeviceForUser(
+		@PathVariable(value="deviceId") final UUID deviceId,
+		@PathVariable(value="userId") final UUID userId
+	) {
+		logger.info("Fetching device with user id " + userId + " for device " + deviceId);
+		return this.deviceRepository.findOneByIdAndUsersId(deviceId, userId);
 	}
 }
