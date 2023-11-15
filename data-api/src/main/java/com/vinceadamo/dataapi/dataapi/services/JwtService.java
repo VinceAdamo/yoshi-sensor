@@ -2,6 +2,8 @@ package com.vinceadamo.dataapi.dataapi.services;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.vinceadamo.dataapi.dataapi.entities.User;
@@ -10,7 +12,8 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-    private final String secret = "my-secret-key";
+    @Value("${application.jwt.secret}")
+    private String secret;
     private final long expiration = 86400000; // 24 hours in milliseconds
 
     public String generateToken(User user) {
