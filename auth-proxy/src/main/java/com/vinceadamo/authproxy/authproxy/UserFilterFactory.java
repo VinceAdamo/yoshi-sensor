@@ -5,15 +5,10 @@ import java.util.UUID;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.cloud.gateway.support.NotFoundException;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.stereotype.Component;
 
 import org.springframework.web.server.ServerWebExchange;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vinceadamo.authproxy.authproxy.exceptions.InvalidAuthHeaderException;
 import com.vinceadamo.authproxy.authproxy.helpers.HttpExceptionHandler;
 import com.vinceadamo.authproxy.authproxy.jsonobjects.User;
