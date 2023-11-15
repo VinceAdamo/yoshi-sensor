@@ -7,8 +7,10 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vinceadamo.authproxy.authproxy.jsonobjects.User;
@@ -16,11 +18,14 @@ import com.vinceadamo.authproxy.authproxy.jsonobjects.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+@Service
 public class UserService {
     static Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    public static User read(UUID id) throws NotFoundException, Exception {
+    @Value("${api.user.url}")
+    private String url;
+
+    public User read(UUID id) throws NotFoundException, Exception {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
@@ -29,7 +34,7 @@ public class UserService {
             HttpRequest request = HttpRequest
                 .newBuilder()
                 .GET()
-                .uri(URI.create("http://localhost:8090/user/" + id))
+                .uri(URI.create(url + "/" + id))
                 .header("accept", "application/json")
                 .build();
 

@@ -9,16 +9,22 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vinceadamo.authproxy.authproxy.jsonobjects.Device;
 
+@Service
 public class DeviceService {
     static Logger logger = LoggerFactory.getLogger(DeviceService.class);
 
-    public static Device readDeviceForUser(UUID deviceId, UUID userId) throws Exception {
+    @Value("${api.device.url}")
+    private String url;
+
+    public Device readDeviceForUser(UUID deviceId, UUID userId) throws Exception {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
@@ -27,7 +33,7 @@ public class DeviceService {
             HttpRequest request = HttpRequest
                 .newBuilder()
                 .GET()
-                .uri(URI.create("http://localhost:8090/device/" + deviceId + "/user/" + userId))
+                .uri(URI.create(url + "/" + deviceId + "/user/" + userId))
                 .header("accept", "application/json")
                 .build();
 

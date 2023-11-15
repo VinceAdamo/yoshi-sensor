@@ -32,6 +32,8 @@ public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFa
 
     @Autowired JwtService jwtService;
 
+    @Autowired UserService userService;
+
     public UserFilterFactory() {
         super(Config.class);
     }
@@ -124,7 +126,7 @@ public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFa
 
     private boolean doesUserExistInDatabase(UUID id, String email) throws Exception {
         try {
-            User user = UserService.read(id);
+            User user = userService.read(id);
             logger.info("Sucessfully retrieved user with email " + user.email + " from database");
             return email.equals(user.email);
         } catch (NotFoundException e) {

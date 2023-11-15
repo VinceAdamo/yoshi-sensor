@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.cloud.gateway.support.NotFoundException;
@@ -18,6 +19,8 @@ import com.vinceadamo.authproxy.authproxy.services.DeviceService;
 @Component
 public class UserDeviceAccessFilterFactory extends AbstractGatewayFilterFactory<UserDeviceAccessFilterFactory.Config> {
     Logger logger = LoggerFactory.getLogger(UserDeviceAccessFilterFactory.class);
+
+    @Autowired DeviceService deviceService;
 
     public UserDeviceAccessFilterFactory() {
         super(Config.class);
@@ -37,7 +40,7 @@ public class UserDeviceAccessFilterFactory extends AbstractGatewayFilterFactory<
 
                 logger.info("userId " + userId + " retrived from previous filter");
 
-                DeviceService.readDeviceForUser(deviceId, userId);
+                deviceService.readDeviceForUser(deviceId, userId);
 
                 logger.info("User " + userId + " is allowed to access device " + deviceId);
 

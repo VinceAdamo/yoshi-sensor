@@ -1,6 +1,11 @@
 application:
   jwt:
     secret: ${JWT_SECRET}
+api:
+  user:
+    url: ${USER_SERVICE}
+  device: 
+    url: ${DEVICE_SERVICE}
 spring:
   cloud:
     gateway:
