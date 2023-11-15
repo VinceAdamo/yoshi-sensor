@@ -10,10 +10,12 @@ import org.springframework.stereotype.Component;
 
 import org.springframework.web.server.ServerWebExchange;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vinceadamo.authproxy.authproxy.exceptions.InvalidAuthHeaderException;
+import com.vinceadamo.authproxy.authproxy.helpers.HttpExceptionHandler;
 import com.vinceadamo.authproxy.authproxy.jsonobjects.User;
 import com.vinceadamo.authproxy.authproxy.services.JwtService;
 import com.vinceadamo.authproxy.authproxy.services.UserService;
@@ -22,11 +24,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,22 +61,43 @@ public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFa
 
                 if (doesUserExistInDatabase(id, email)) {
                     logger.info("User successfully authenticated");
+                    exchange.getAttributes().put("userId", id);
                     return chain.filter(exchange);
                 }
 
-                return exceptionHandler(exchange, "Invalid User!");
+                return HttpExceptionHandler.sendErrorResponse(
+                    exchange, 
+                    "Invalid User!",
+                    HttpStatus.UNAUTHORIZED
+                );
             } catch (InvalidAuthHeaderException e) {
                 logger.error(e.getMessage());
-                return exceptionHandler(exchange, e.getMessage());
+                return HttpExceptionHandler.sendErrorResponse(
+                    exchange, 
+                    e.getMessage(),
+                    HttpStatus.UNAUTHORIZED
+                );
             } catch (ExpiredJwtException e) {
                 logger.error("JWT is expired");
-                return exceptionHandler(exchange, "JWT is expired");
+                return HttpExceptionHandler.sendErrorResponse(
+                    exchange, 
+                    "JWT is expired",
+                    HttpStatus.UNAUTHORIZED
+                );
             } catch (SignatureException | MalformedJwtException e) {
                 logger.error("JWT is invalid");
-                return exceptionHandler(exchange, "JWT is invalid");
+                return HttpExceptionHandler.sendErrorResponse(
+                    exchange, 
+                    "JWT is invalid",
+                    HttpStatus.UNAUTHORIZED
+                );
             } catch (Exception e) {
                 logger.error(e.getMessage());
-                return sendInternalServerError(exchange);
+                return HttpExceptionHandler.sendErrorResponse(
+                    exchange, 
+                    e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+                );
             }
         };
     }
@@ -113,33 +133,6 @@ public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFa
             logger.error("User could not be retrieved from database");
             return false;
         }
-    }
-
-    private Mono<Void> exceptionHandler(ServerWebExchange exchange, String errorMessage) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            ObjectNode rootNode = mapper.createObjectNode();
-
-            rootNode.put("message", errorMessage);
-            rootNode.put("statusCode", HttpStatus.UNAUTHORIZED.value());
-
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
-
-            final ObjectWriter writer = mapper.writer();
-            final byte[] bytes = writer.writeValueAsBytes(rootNode);
-
-            DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
-
-            return exchange.getResponse().writeWith(Flux.just(buffer));
-        } catch (Exception e) {
-            return sendInternalServerError(exchange);
-        }
-    }
-
-    private Mono<Void> sendInternalServerError(ServerWebExchange exchange) {
-        exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-        return exchange.getResponse().setComplete();
     }
 
     public static class Config {

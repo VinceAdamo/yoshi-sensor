@@ -5,10 +5,18 @@ spring:
         - id: data
           uri: http://localhost:8090
           predicates:
-            - Path=/temperature/**,/humidity/**,/device/**
+            - Path=/humidity/{deviceId}/latest,/temperature/{deviceId}/latest
           filters:
             - UserFilterFactory
-        - id: user
+            - UserDeviceAccessFilterFactory
+        - id: login
           uri: http://localhost:8090
           predicates:
             - Path=/user/login
+        - id: userDevices
+          uri: http://localhost:8090
+          predicates:
+            - Path=/device/user
+          filters:
+            - UserFilterFactory
+            - UserUrlFilterFactory
