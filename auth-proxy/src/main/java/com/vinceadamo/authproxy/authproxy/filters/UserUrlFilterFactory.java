@@ -1,4 +1,4 @@
-package com.vinceadamo.authproxy.authproxy;
+package com.vinceadamo.authproxy.authproxy.filters;
 
 import java.util.UUID;
 

@@ -1,7 +1,8 @@
-package com.vinceadamo.authproxy.authproxy;
+package com.vinceadamo.authproxy.authproxy.filters;
 
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.cloud.gateway.support.NotFoundException;
@@ -29,6 +30,8 @@ import org.slf4j.LoggerFactory;
 public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFactory.Config> {
     Logger logger = LoggerFactory.getLogger(UserFilterFactory.class);
 
+    @Autowired JwtService jwtService;
+
     public UserFilterFactory() {
         super(Config.class);
     }
@@ -42,7 +45,7 @@ public class UserFilterFactory extends AbstractGatewayFilterFactory<UserFilterFa
                 logger.info("Successfully extracted token from header");
                 logger.debug(token);
                 
-                Claims claims = JwtService.validate(token);
+                Claims claims = jwtService.validate(token);
 
                 logger.info("Successfully validated token");
 

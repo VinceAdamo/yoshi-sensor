@@ -1,18 +1,23 @@
 package com.vinceadamo.authproxy.authproxy.services;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureException;
 
+@Service
 public class JwtService {
-    private static final String secret = "my-secret-key";
+    @Value("${application.jwt.secret}")
+    private String secret;
 
-    public static Claims validate(String token) throws ExpiredJwtException, SignatureException {
+    public Claims validate(String token) throws ExpiredJwtException, SignatureException {
         Jws<Claims> claimsJws = Jwts
                 .parser()
-                .setSigningKey(secret)
+                .setSigningKey(this.secret)
                 .parseClaimsJws(token);
 
         return claimsJws.getBody();
