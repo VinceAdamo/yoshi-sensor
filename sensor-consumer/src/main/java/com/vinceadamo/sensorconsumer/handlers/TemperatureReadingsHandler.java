@@ -24,6 +24,6 @@ public class TemperatureReadingsHandler extends ReadingsHandler {
 
     Measurement create() throws Exception {
         logger.info("Creating new temperature measurement");
-        return MeasurementService.create(this.measurementType, this.device.id, this.value, this.timestamp);
+        return MeasurementService.create(this.measurementType, this.device.id, this.roundedValue, this.timestamp);
     }
  }

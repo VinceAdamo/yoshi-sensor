@@ -1,5 +1,7 @@
 package com.vinceadamo.sensorconsumer.handlers;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +19,7 @@ public abstract class ReadingsHandler {
     protected String urlBasePath;
     protected Device device;
     protected String measurementType;
+    protected float roundedValue;
     
     public ReadingsHandler(Timestamp timestamp, String serialNumber, Device device) {
         this.timestamp = timestamp;
@@ -28,15 +31,23 @@ public abstract class ReadingsHandler {
 
     abstract Measurement create() throws Exception;
 
+    void setRoundedValue() {
+        int places = 1;
+        BigDecimal roundedNumber = new BigDecimal(this.value).setScale(places, RoundingMode.HALF_UP);
+        this.roundedValue = roundedNumber.floatValue();
+    }
+
     public void handleReadings() {
         try {
+            this.setRoundedValue();
+
             Measurement measurement = this.getLatest();
 
             logger.debug(measurement.toString());
 
             int compareValue = this.timestamp.compareTo(measurement.timestamp);
 
-            if (compareValue > 0 && measurement.value != this.value)  {
+            if (compareValue > 0 && measurement.value != this.roundedValue)  {
                 Measurement newMeasurement = this.create();
                 logger.debug("Measurement with id " + newMeasurement.id + " created");
                 return;
