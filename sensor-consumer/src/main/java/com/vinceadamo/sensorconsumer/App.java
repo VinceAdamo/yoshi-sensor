@@ -1,8 +1,11 @@
 package com.vinceadamo.sensorconsumer;
 
-import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -13,11 +16,30 @@ public class App
 
     public static void main( String[] args ) throws MqttException
     {
-        MqttClient client=new MqttClient("tcp://localhost:2883", "sensor-consumer");
+        MemoryPersistence persistence = new MemoryPersistence();
+        MqttAsyncClient client = new MqttAsyncClient("tcp://localhost:2883", "sensor-consumer", persistence);
+        MqttConnectOptions options = new MqttConnectOptions();
+        options.setCleanSession(true);
         client.setCallback( new SimpleMqttCallBack() );
+
         logger.info( "Connecting to client..." );
-        client.connect();
-        logger.info( "Subscribing to topic readings..." );
-        client.subscribe("readings");
+        client.connect(options, null, new IMqttActionListener() {
+            @Override
+            public void onSuccess(IMqttToken asyncActionToken) {
+                try {
+                    logger.info("Connected to MQTT broker");
+
+                    logger.info( "Subscribing to topic readings..." );
+                    client.subscribe("readings", 1);
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+               logger.error("Failed to connect to MQTT broker");
+            }
+        });
     }
 }

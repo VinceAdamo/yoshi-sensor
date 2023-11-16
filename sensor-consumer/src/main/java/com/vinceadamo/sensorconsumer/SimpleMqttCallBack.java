@@ -71,6 +71,6 @@ class SimpleMqttCallBack implements MqttCallback {
    }
  
   public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-    // not used in this example}
+    logger.info("Delivery complete");
   }
 }
