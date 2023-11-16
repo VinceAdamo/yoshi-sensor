@@ -16,10 +16,14 @@ public class App
 
     public static void main( String[] args ) throws MqttException
     {
+        String username = "mosquitto";
+        String password = "mosquitto";
         MemoryPersistence persistence = new MemoryPersistence();
         MqttAsyncClient client = new MqttAsyncClient("tcp://localhost:2883", "sensor-consumer", persistence);
         MqttConnectOptions options = new MqttConnectOptions();
         options.setCleanSession(true);
+        options.setUserName(username);
+        options.setPassword(password.toCharArray());
         client.setCallback( new SimpleMqttCallBack() );
 
         logger.info( "Connecting to client..." );

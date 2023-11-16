@@ -1,13 +1,15 @@
 version: '3.9'
 services:
     mosquitto:
-        image: eclipse-mosquitto
+        build: ./mosquitto
+        container_name: eclipse-mosquitto
         restart: always
         ports:
             - 2883:2883
             - 9001:9001
         volumes:
           - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+          - ./mosquitto/password-temp.txt:/mosquitto/config/password-temp.txt
     postgres:
         image: postgres:11.13
         restart: always
