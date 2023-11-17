@@ -15,6 +15,8 @@ import com.vinceadamo.sensorconsumer.jsonobjects.Device;
 public class DeviceService {
     private static Logger logger = LogManager.getLogger(DeviceService.class);
 
+    private static String url = System.getenv("DEVICE_SERVICE");
+
     public static Device readBySerialNumber(String serialNumber) throws Exception {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -24,7 +26,7 @@ public class DeviceService {
             HttpRequest request = HttpRequest
                 .newBuilder()
                 .GET()
-                .uri(URI.create("http://localhost:8090/device/serialNumber/" + serialNumber))
+                .uri(URI.create(url + "/serialNumber/" + serialNumber))
                 .header("accept", "application/json")
                 .build();
 

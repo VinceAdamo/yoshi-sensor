@@ -16,8 +16,8 @@ public class App
 
     public static void main( String[] args ) throws MqttException
     {
-        String username = "mosquitto";
-        String password = "mosquitto";
+        String username = System.getenv("MOSQUITTO_USERNAME");
+        String password = System.getenv("MOSQUITTO_PASSWORD");
         MemoryPersistence persistence = new MemoryPersistence();
         MqttAsyncClient client = new MqttAsyncClient("tcp://localhost:2883", "sensor-consumer", persistence);
         MqttConnectOptions options = new MqttConnectOptions();

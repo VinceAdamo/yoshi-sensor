@@ -1,4 +1,4 @@
-FROM eclipse-mosquitto:1.5.6
+FROM eclipse-mosquitto:latest
 
 COPY docker-entrypoint.sh /
 

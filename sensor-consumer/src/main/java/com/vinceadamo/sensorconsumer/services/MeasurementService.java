@@ -17,6 +17,8 @@ import com.vinceadamo.sensorconsumer.jsonobjects.Measurement;
 public class MeasurementService {
     private static Logger logger = LogManager.getLogger(MeasurementService.class);
 
+    private static String url = System.getenv("DATA_API");
+
     public static Measurement getLatest(String measurementType, UUID deviceId) throws Exception {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -26,7 +28,7 @@ public class MeasurementService {
             HttpRequest request = HttpRequest
                 .newBuilder()
                 .GET()
-                .uri(URI.create("http://localhost:8090/" + measurementType + "/" + deviceId + "/latest"))
+                .uri(URI.create(url + "/" + measurementType + "/" + deviceId + "/latest"))
                 .header("accept", "application/json")
                 .build();
 
@@ -50,7 +52,7 @@ public class MeasurementService {
             HttpRequest request = HttpRequest
                 .newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(body))
-                .uri(URI.create("http://localhost:8090/" + measurementType))
+                .uri(URI.create(url + "/" + measurementType))
                 .header("Content-Type", "application/json")
                 .build();
 
